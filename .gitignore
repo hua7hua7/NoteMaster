@@ -1,10 +1,72 @@
-.vs/
+# 基本忽略
 bin/
 obj/
 *.user
 *.suo
+*.userosscache
+*.sln.docstates
+
+# VS 临时文件夹
+.vs/
+.vscode/
+
+# 编译生成的临时文件
+*.exe
+*.dll
+*.pdb
 *.cache
 *.log
+*.vspscc
+*.vssscc
+*.dbmdl
+
+# Windows系统自带的临时文件
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# 不跟踪本地配置
+*.localhistory
+*.orig
+
+# Rider 或其他IDE生成的文件
+.idea/
+
+# NuGet 包管理文件
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET特有的（如果你将来做Web可以继续用）
+*.publishsettings
+*.azurePubxml
+*.Publish.xml
+
+# WPF/WinForms特有的一些缓存
+*.g.*
+*.i.*
+*.db
+
+# 临时测试文件
+TestResults/
+*.TestResults
+
+# 不同步用户配置
+*.csproj.user
+*.sln.docstates
+
+# 可选：如果你有本地数据库
+*.mdf
+*.ldf
+
+# 可选：如果有Docker文件也可以加上
+docker-compose.override.yml
+
+# 其他常见忽略
+*.swp
+*.bak
 *.tmp
-*.pdb
-*.userprefs
+*.tmp.*
