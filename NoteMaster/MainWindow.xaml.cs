@@ -20,7 +20,7 @@ namespace NoteMaster
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainViewModel();
+          
         }
     }
 }
