@@ -2,7 +2,6 @@
 using System.Data;
 using System.Windows;
 using NoteMaster.ViewModels;
-
 namespace NoteMaster
 {
     public partial class App : Application
@@ -17,5 +16,4 @@ namespace NoteMaster
             mainWindow.Show();
         }
     }
-
 }
