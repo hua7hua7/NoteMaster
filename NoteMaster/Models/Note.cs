@@ -11,6 +11,6 @@ namespace NoteMaster.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
         public List<string> Tags { get; set; } = new List<string>();
-        public string FolderId { get; set; }
+        public int? FolderId { get; set; }
     }
 }
