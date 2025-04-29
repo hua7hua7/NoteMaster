@@ -44,7 +44,21 @@ namespace NoteMaster.ViewModels
 
         private void CreateNote()
         {
-            // TODO: 打开便签编辑窗口
+             var newNote = new Note
+            {
+                Title = "New Note",
+                Content = ""
+            };
+            Notes.Add(newNote);
+            _storageService.SaveNotes(Notes.ToList()); // 保存到文件
+
+             var editWindow = new NoteEditWindow(newNote);
+            editWindow.Closed += (s, e) =>
+            {
+                _storageService.SaveNotes(Notes.ToList()); // 保存编辑后的笔记
+                OnPropertyChanged(nameof(Notes)); // 刷新列表
+            };
+            editWindow.ShowDialog();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -1,0 +1,21 @@
+<Window x:Class="NoteMaster.NoteEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Edit Note" Height="400" Width="600">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" 
+                 FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+        <TextBox Grid.Row="1" Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}" 
+                 AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto"/>
+
+        <Button Grid.Row="2" Content="Close" Click="Close_Click" HorizontalAlignment="Right" 
+                Margin="0,10,0,0" Padding="10,5"/>
+    </Grid>
+</Window>
