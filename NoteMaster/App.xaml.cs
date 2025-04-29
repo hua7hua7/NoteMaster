@@ -11,9 +11,9 @@ namespace NoteMaster
             base.OnStartup(e);
             var mainWindow = new MainWindow
             {
-                DataContext = new MainViewModel()
+                //DataContext = new MainViewModel()
             };
-            mainWindow.Show();
+            //mainWindow.Show();
         }
     }
 }
