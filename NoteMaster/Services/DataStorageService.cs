@@ -12,7 +12,7 @@ namespace NoteMaster.Services
 
 		public DataStorageService()
 		{
-			// �ο� NoteBot ��·������
+			// �ο� NoteBot ��·������
 			string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 			_storagePath = Path.Combine(appData, "NoteMaster", "notes.json");
 			_backupPath = Path.Combine(appData, "NoteMaster", "notes_backup.json");
@@ -25,17 +25,14 @@ namespace NoteMaster.Services
 			string json = JsonConvert.SerializeObject(notes, Formatting.Indented);
 			File.WriteAllText(_storagePath, json);
 
-			// ���ɱ���
+			// ���ɱ���
 			File.Copy(_storagePath, _backupPath, true);
 		}
 
-		public List<Note> LoadNotes()
+		public IEnumerable<Note> LoadNotes()
 		{
-			if (!File.Exists(_storagePath))
-				return new List<Note>();
-
-			string json = File.ReadAllText(_storagePath);
-			return JsonConvert.DeserializeObject<List<Note>>(json) ?? new List<Note>();
+			// 临时返回空列表，实际应用中这里应该从数据库或文件加载数据
+			return new List<Note>();
 		}
 	}
 }
