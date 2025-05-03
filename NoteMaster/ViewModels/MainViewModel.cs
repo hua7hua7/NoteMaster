@@ -1,6 +1,8 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using System.Linq;
 using System.Windows;
@@ -13,11 +15,17 @@ namespace NoteMaster.ViewModels
     public class MainViewModel : INotifyPropertyChanged
     {
         private readonly DataStorageService _storageService;
+
+        //dev_A分支的变量， remained to be merged
+        /*private string _searchQuery;
+        private ObservableCollection<Note> _notes;
+        private ObservableCollection<Note> _allNotes;*/ // 存储所有笔记的备份
         private string _searchQuery = string.Empty;
         private ObservableCollection<Note> _notes = new();
         private ObservableCollection<Folder> _folders = new();
         private Folder? _selectedFolder;
         private ObservableCollection<Note> _selectedNotes = new();
+
 
         public ObservableCollection<Note> Notes
         {
@@ -67,12 +75,18 @@ namespace NoteMaster.ViewModels
             {
                 _searchQuery = value;
                 OnPropertyChanged(nameof(SearchQuery));
+         //dev_A的操作
+                //PerformSearch();
                 FilterNotes();
+
             }
         }
 
         // 命令定义
         public ICommand CreateNoteCommand { get; }
+        //dev_A的定义
+       // public ICommand SearchCommand { get; }
+       // public ICommand CloseCommand { get; }
         public ICommand CreateFolderCommand { get; }
         public ICommand DeleteFolderCommand { get; }
         public ICommand RenameFolderCommand { get; }
@@ -80,9 +94,17 @@ namespace NoteMaster.ViewModels
         public ICommand RemoveNotesFromFolderCommand { get; }
         public ICommand DeleteSelectedNotesCommand { get; }
 
+
         public MainViewModel()
         {
             _storageService = new DataStorageService();
+//dev_A的操作  
+//             _allNotes = new ObservableCollection<Note>(_storageService.LoadNotes());
+//             Notes = new ObservableCollection<Note>(_allNotes);
+            
+//             CreateNoteCommand = new RelayCommand(CreateNote);
+//             SearchCommand = new RelayCommand(ShowSearchDialog);
+//             CloseCommand = new RelayCommand(CloseApplication);
             Notes = new ObservableCollection<Note>(_storageService.LoadNotes());
             Folders = new ObservableCollection<Folder>(_storageService.LoadFolders());
             SelectedNotes = new ObservableCollection<Note>();
@@ -101,10 +123,12 @@ namespace NoteMaster.ViewModels
         {
             _storageService.SaveNotes(Notes.ToList());
             OnPropertyChanged(nameof(Notes));
+
         }
 
         private void CreateNote()
         {
+
             var newNote = new Note
             {
                 Title = "New Note",
@@ -288,6 +312,7 @@ namespace NoteMaster.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
+
 
     public class RelayCommand : ICommand
     {

@@ -9,14 +9,16 @@ namespace NoteMaster.Services
 {
 	public class DataStorageService
 	{
-		private readonly string _storagePath;//jsonÂ·¾¶
-		private readonly string _backupPath;// ±¸·İÂ·¾¶
-		private readonly string _foldersPath;// ÎÄ¼ş¼ĞÂ·¾¶
-		private readonly string _foldersBackupPath;// ±¸·İÂ·¾¶
-        private readonly string _dbPath;                // Êı¾İ¿âÂ·¾¶
+		private readonly string _storagePath;//jsonè·¯å¾„
+		private readonly string _backupPath;// å¤‡ä»½è·¯å¾„
+		private readonly string _foldersPath;// æ–‡ä»¶å¤¹è·¯å¾„
+		private readonly string _foldersBackupPath;// å¤‡ä»½è·¯å¾„
+        private readonly string _dbPath;                // æ•°æ®åº“è·¯å¾„
 
 		public DataStorageService()
 		{
+
+
 			string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 			string baseDir = Path.Combine(appData, "NoteMaster");
 			Directory.CreateDirectory(baseDir);
@@ -27,10 +29,10 @@ namespace NoteMaster.Services
 			_foldersBackupPath = Path.Combine(baseDir, "folders_backup.json");
             _dbPath = Path.Combine(baseDir, "notes.db");
             Directory.CreateDirectory(Path.GetDirectoryName(_storagePath));
-            InitializeDatabase(); // ³õÊ¼»¯Êı¾İ¿â
+            InitializeDatabase(); // åˆå§‹åŒ–æ•°æ®åº“
             }
         
-  private void InitializeDatabase()// ³õÊ¼»¯Êı¾İ¿â
+  private void InitializeDatabase()// åˆå§‹åŒ–æ•°æ®åº“
     {
         try
         {
@@ -60,14 +62,14 @@ namespace NoteMaster.Services
     }
 		 public void SaveNotes(List<Note> notes)
     {
-        // ±£´æµ½ JSON
+        // ä¿å­˜åˆ° JSON
         string json = JsonConvert.SerializeObject(notes, Formatting.Indented);
         File.WriteAllText(_storagePath, json);
 
         try { File.Copy(_storagePath, _backupPath, true); }
         catch (Exception ex) { Console.WriteLine($"Failed to backup notes: {ex.Message}"); }
 
-        // ±£´æµ½Êı¾İ¿â
+        // ä¿å­˜åˆ°æ•°æ®åº“
         using var conn = new SQLiteConnection($"Data Source={_dbPath};Version=3;");
         conn.Open();
 
@@ -83,8 +85,18 @@ namespace NoteMaster.Services
             cmd.Parameters.AddWithValue("$createdAt", note.CreatedAt.ToString("o"));
             cmd.Parameters.AddWithValue("$updatedAt", note.UpdatedAt.ToString("o"));
             cmd.ExecuteNonQuery();
+          
+//dev_Aåˆ†æ”¯æœ‰ï¼š remained to be solved     
+  		/*File.Copy(_storagePath, _backupPath, true);
+		}
 
-            // ¸üĞÂ Tags
+		public IEnumerable<Note> LoadNotes()
+		{
+	
+			return new List<Note>();
+		}
+	}*/
+            // æ›´æ–° Tags
             cmd.CommandText = "DELETE FROM Tags WHERE NoteId = $noteId";
             cmd.Parameters.Clear();
             cmd.Parameters.AddWithValue("$noteId", note.Id);
@@ -121,11 +133,11 @@ namespace NoteMaster.Services
             Console.WriteLine($"Failed to load notes from JSON: {ex.Message}");
         }
 
-        // ´ÓÊı¾İ¿â¼ÓÔØ±êÇ©ºÍÔªĞÅÏ¢
+        // ä»æ•°æ®åº“åŠ è½½æ ‡ç­¾å’Œå…ƒä¿¡æ¯
         using var conn = new SQLiteConnection($"Data Source={_dbPath};Version=3;");
         conn.Open();
 
-        // ¼ÓÔØËùÓĞ±êÇ©
+        // åŠ è½½æ‰€æœ‰æ ‡ç­¾
         var tagDict = new Dictionary<string, List<string>>();
         var cmd = conn.CreateCommand();
         cmd.CommandText = "SELECT NoteId, Tag FROM Tags";
@@ -141,7 +153,7 @@ namespace NoteMaster.Services
             }
         }
 
-        // ¸üĞÂ notes ÖĞµÄ±êÇ©ºÍÔªÊı¾İ
+        // æ›´æ–° notes ä¸­çš„æ ‡ç­¾å’Œå…ƒæ•°æ®
         foreach (var note in notes)
         {
             note.Tags = tagDict.ContainsKey(note.Id) ? tagDict[note.Id] : new List<string>();
@@ -163,7 +175,7 @@ namespace NoteMaster.Services
         return notes;
     }
 
-    // ? ²»¸Ä¶¯ Folder Ïà¹Ø²¿·Ö ?
+    // ? ä¸æ”¹åŠ¨ Folder ç›¸å…³éƒ¨åˆ† ?
     public void SaveFolders(List<Folder> folders)
     {
         string json = JsonConvert.SerializeObject(folders, Formatting.Indented);
@@ -180,4 +192,5 @@ namespace NoteMaster.Services
         return JsonConvert.DeserializeObject<List<Folder>>(json) ?? new List<Folder>();
     }
     }
+
 }

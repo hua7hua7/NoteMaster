@@ -11,9 +11,11 @@ namespace NoteMaster
         {
             try
             {
+
                 base.OnStartup(e);
                 
                 // 创建主窗口
+                //dev_A分支为：DataContext = new MainViewModel()
                 var viewModel = new MainViewModel();
                 var mainWindow = new MainWindow(viewModel);
                 
@@ -48,6 +50,7 @@ namespace NoteMaster
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+
         }
     }
 }
