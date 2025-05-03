@@ -1,6 +1,7 @@
-﻿<Window x:Class="NoteMaster.MainWindow"
+﻿<Window x:Class="NoteMaster.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+
         xmlns:vm="clr-namespace:NoteMaster.ViewModels"
         Title="NoteMaster" Height="650" Width="400"
         WindowStartupLocation="CenterScreen"
@@ -107,5 +108,6 @@
 
 
         </Grid>
+
     </Grid>
 </Window>
