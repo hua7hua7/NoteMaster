@@ -9,9 +9,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Views\Assets\Avatars\avatar-1.jpg" />
+    <None Remove="Views\Assets\Avatars\avatar-2.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Views\Assets\Avatars\avatar-1.jpg" />
+    <Resource Include="Views\Assets\Avatars\avatar-2.jpg" />
   </ItemGroup>
 
 </Project>

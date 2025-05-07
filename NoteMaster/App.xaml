@@ -5,7 +5,16 @@
         
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Views/style/MainWindowDictionary.xaml"/>
+                <!--将资源添加到资源字典-->
+                <ResourceDictionary Source="/Views/Themes/LightTheme.xaml"/>
+
+                <ResourceDictionary Source="/Views/Assets/Icons/Icons.xaml"/>
+
+                <ResourceDictionary Source="/Views/Styles/MainStyle.xaml"/>
+                
+                <ResourceDictionary Source="/Views/Styles/HomePageStyle.xaml"/>
+                
+                <!--<ResourceDictionary Source="/Views/style/MainWindowDictionary.xaml"/>-->
             </ResourceDictionary.MergedDictionaries>
             
         </ResourceDictionary>
