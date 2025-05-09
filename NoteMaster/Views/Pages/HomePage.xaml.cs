@@ -36,5 +36,10 @@ namespace NoteMaster.Views.Pages
                 MessageBox.Show($"标题: {selectedNote.Title}\n内容: {selectedNote.Content}", "笔记详情");
             }
         }
+        private void rd_addNote(object sender,RoutedEventArgs e)
+        {
+            //PagesNavigation.Navigate(new System.Uri("/Views/Pages/HomePage.xaml", UriKind.RelativeOrAbsolute));
+        }
+        
     }
 }

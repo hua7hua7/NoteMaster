@@ -9,25 +9,50 @@
 
 
     <Border CornerRadius="5" Background="{DynamicResource SecundaryBackgroundColor}">
-        <!--<Label Content="笔记" Foreground="Black" FontSize="50" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>-->
-        <ListView x:Name="noteList" ItemsSource="{Binding Notes}" Margin="20" Background="Transparent" BorderThickness="0" ItemContainerStyle="{StaticResource lstStyle}">
-            <!--让ListView控件本身的点击效果失效-->
-            
-
-
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <!--为笔记卡片添加点击事件-->
-                    <Border Background="White" Margin="0,0,0,10" Padding="16" CornerRadius="6" MouseLeftButtonDown="NoteCard_Click"
-                    Cursor="Hand">
-                        <StackPanel>
-                            <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
-                            <TextBlock Text="{Binding CreatedAt, StringFormat='{}{0:MM月dd日}'}" FontSize="12" Foreground="#888" Margin="0,4,0,0"/>
-                            <TextBlock Text="{Binding Content}" FontSize="14" Foreground="#444" MaxHeight="60" TextTrimming="CharacterEllipsis" Margin="0,4,0,0"/>
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="20,20,20,0" VerticalAlignment="Top">
+                <TextBox Width="200" Height="32" Margin="0,0,8,0" VerticalAlignment="Center"
+                         Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                         FontSize="16" FontFamily="Segoe UI, Microsoft YaHei UI" 
+                         Background="#FFF" BorderBrush="#DDD" BorderThickness="1"
+                         Padding="10,0,10,0"
+                         Foreground="#222"
+                         HorizontalContentAlignment="Left"
+                         VerticalContentAlignment="Center">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="16"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+                <Button Style ="{StaticResource IconStyle}" Tag="search"  
+                    Command="{Binding SearchCommand}">
+                    <Path Data="{StaticResource search}" Fill="#000" Width="18" Height="18"/>
+                </Button>
+                <!--为“新建”添加点击事件，跳转到新建文件的页面-->
+                <Button Style ="{StaticResource IconStyle}" Tag="add"   ToolTip="添加笔记"  Click="rd_addNote">
+                    <Path Data="{StaticResource add}" Fill="#000" Width="18" Height="18"/>
+                </Button>
+            </StackPanel>
+            <ListView x:Name="noteList" ItemsSource="{Binding Notes}" Margin="20,10,20,20" Background="Transparent" BorderThickness="0" ItemContainerStyle="{StaticResource lstStyle}">
+                <!--让ListView控件本身的点击效果失效-->
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <!--为笔记卡片添加点击事件-->
+                        <Border Background="White" Margin="0,0,0,10" Padding="16" CornerRadius="6" 
+                                MouseLeftButtonDown="NoteCard_Click" Cursor="Hand">
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="cardScale" ScaleX="1" ScaleY="1"/>
+                            </Border.RenderTransform>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding CreatedAt, StringFormat='{}{0:MM月dd日}'}" FontSize="12" Foreground="#888" Margin="0,4,0,0"/>
+                                <TextBlock Text="{Binding Content}" FontSize="14" Foreground="#444" MaxHeight="60" TextTrimming="CharacterEllipsis" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackPanel>
     </Border>
 </Page>

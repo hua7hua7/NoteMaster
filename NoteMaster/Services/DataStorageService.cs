@@ -86,16 +86,7 @@ namespace NoteMaster.Services
             cmd.Parameters.AddWithValue("$updatedAt", note.UpdatedAt.ToString("o"));
             cmd.ExecuteNonQuery();
           
-//dev_A分支有： remained to be solved     
-  		/*File.Copy(_storagePath, _backupPath, true);
-		}
 
-		public IEnumerable<Note> LoadNotes()
-		{
-	
-			return new List<Note>();
-		}
-	}*/
             // 更新 Tags
             cmd.CommandText = "DELETE FROM Tags WHERE NoteId = $noteId";
             cmd.Parameters.Clear();

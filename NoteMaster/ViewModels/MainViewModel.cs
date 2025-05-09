@@ -20,6 +20,7 @@ namespace NoteMaster.ViewModels
         /*private string _searchQuery;
         private ObservableCollection<Note> _notes;
         private ObservableCollection<Note> _allNotes;*/ // 存储所有笔记的备份
+
         private string _searchQuery = string.Empty;
         private ObservableCollection<Note> _notes = new();
         private ObservableCollection<Folder> _folders = new();
@@ -98,13 +99,6 @@ namespace NoteMaster.ViewModels
         public MainViewModel()
         {
             _storageService = new DataStorageService();
-//dev_A的操作  
-//             _allNotes = new ObservableCollection<Note>(_storageService.LoadNotes());
-//             Notes = new ObservableCollection<Note>(_allNotes);
-            
-//             CreateNoteCommand = new RelayCommand(CreateNote);
-//             SearchCommand = new RelayCommand(ShowSearchDialog);
-//             CloseCommand = new RelayCommand(CloseApplication);
             Notes = new ObservableCollection<Note>(_storageService.LoadNotes());
             Folders = new ObservableCollection<Folder>(_storageService.LoadFolders());
             SelectedNotes = new ObservableCollection<Note>();

@@ -7,12 +7,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.RightsManagement;
+using NoteMaster.Services;
+using System.Windows.Input;
 
 namespace NoteMaster.ViewModels
 {
    public  class HomePageViewModel : INotifyPropertyChanged
     {
-        private ObservableCollection<Note> _notes;
+        //实现INotifyPropertyChanged接口
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName) =>
+           PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        private readonly DataStorageService _storageService;
+        private ObservableCollection<Note> _notes = new();
+        private ObservableCollection<Folder> _folders = new();
+        private string _searchQuery = string.Empty;
 
         public ObservableCollection<Note> Notes
         {
@@ -27,20 +37,53 @@ namespace NoteMaster.ViewModels
             }
         }
 
-        public HomePageViewModel()
+        public ObservableCollection<Folder> Folders
         {
-            // 示例数据（可以替换为从数据库或服务加载）
-            Notes = new ObservableCollection<Note>
+            get => _folders;
+            set
             {
-                new Note { Title = "笔记 1", Content = "这是第一条笔记的内容...", FolderId = 1 },
-                new Note { Title = "笔记 2", Content = "这是第二条笔记的内容...", FolderId = 2 },
-            };
+                _folders = value;
+                OnPropertyChanged(nameof(Folders));
+            }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public string SearchQuery
+        {
+            get => _searchQuery;
+            set
+            {
+                if (_searchQuery != value)
+                {
+                    _searchQuery = value;
+                    OnPropertyChanged(nameof(SearchQuery));
+                }
+            }
+        }
 
-        protected void OnPropertyChanged(string propertyName) =>
-           PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        public ICommand SearchCommand => new RelayCommand(SearchNotes);
 
+        public HomePageViewModel()
+        {
+            _storageService = new DataStorageService();
+            Notes = new ObservableCollection<Note>(_storageService.LoadNotes());
+            //Folders = new ObservableCollection<Folder>(_storageService.LoadFolders());  
+        }
+
+        private void SearchNotes()
+        {
+            var allNotes = _storageService.LoadNotes();
+            if (string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                Notes = new ObservableCollection<Note>(allNotes);
+            }
+            else
+            {
+                var filtered = allNotes.Where(n =>
+                    (n.Title != null && n.Title.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)) ||
+                    (n.Content != null && n.Content.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))
+                ).ToList();
+                Notes = new ObservableCollection<Note>(filtered);
+            }
+        }
     }
 }
