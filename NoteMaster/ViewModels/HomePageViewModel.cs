@@ -15,7 +15,7 @@ namespace NoteMaster.ViewModels
    public  class HomePageViewModel : INotifyPropertyChanged
     {
         //实现INotifyPropertyChanged接口
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName) =>
            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

@@ -21,7 +21,7 @@ namespace NoteMaster.ViewModels
         private bool _isEditing;                        // 是否处于编辑模式
 
         // 实现INotifyPropertyChanged接口，用于通知UI属性变化
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

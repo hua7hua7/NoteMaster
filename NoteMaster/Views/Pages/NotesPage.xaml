@@ -5,9 +5,38 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="NotesPage">
+      Title="归档板块">
 
-    <Border CornerRadius="5" Background="{DynamicResource SecundaryBackgroundColor}">
-        <Label Content="归档" Foreground="Black" FontSize="50" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-    </Border>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 左侧文件夹列表 -->
+        <Border Grid.Column="0" Background="{DynamicResource SecundaryBackgroundColor}" Margin="5">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="文件夹" FontSize="20" FontWeight="Bold" Margin="5"/>
+                <StackPanel DockPanel.Dock="Top" Orientation="Vertical" Margin="5">
+                    <Button Content="新建文件夹" Command="{Binding CreateFolderCommand}" Margin="0,0,0,5"/>
+                    <Button Content="删除文件夹" Command="{Binding DeleteFolderCommand}" Margin="0,0,0,5"/>
+                    <Button Content="重命名文件夹" Command="{Binding RenameFolderCommand}" Margin="0,0,0,5"/>
+                    <Button Content="取消选择文件夹" Command="{Binding CancelSelectFolderCommand}"/>
+                </StackPanel>
+                <ListBox x:Name="FolderListBox" ItemsSource="{Binding Folders}" SelectedItem="{Binding CurrentFolder, Mode=TwoWay}" DisplayMemberPath="Name" MouseDoubleClick="FolderListBox_MouseDoubleClick"/>
+            </DockPanel>
+        </Border>
+
+        <!-- 右侧便签列表 -->
+        <Border Grid.Column="1" Background="{DynamicResource SecundaryBackgroundColor}" Margin="5">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="便签" FontSize="20" FontWeight="Bold" Margin="5"/>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">
+                    <Button Content="移入当前文件夹" Command="{Binding MoveNotesToFolderCommand}" Margin="0,0,5,0"/>
+                    <Button Content="移出当前文件夹" Command="{Binding RemoveNotesFromFolderCommand}"/>
+                </StackPanel>
+                <ListBox ItemsSource="{Binding DisplayedNotes}" DisplayMemberPath="Title" SelectionMode="Extended" SelectionChanged="NotesListBox_SelectionChanged"/>
+            </DockPanel>
+        </Border>
+    </Grid>
 </Page>

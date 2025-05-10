@@ -2,13 +2,12 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 using System.Linq;
-using System.Windows;
 using NoteMaster.Models;
 using NoteMaster.Services;
 using NoteMaster.Views;
+using System.Windows;
 
 namespace NoteMaster.ViewModels
 {

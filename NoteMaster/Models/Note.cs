@@ -12,5 +12,6 @@ namespace NoteMaster.Models
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
         public List<string> Tags { get; set; } = new List<string>();
         public int? FolderId { get; set; }
+        public bool IsSelected { get; set; }
     }
 }
