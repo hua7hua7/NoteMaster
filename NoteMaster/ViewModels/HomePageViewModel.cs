@@ -61,6 +61,7 @@ namespace NoteMaster.ViewModels
         }
 
         public ICommand SearchCommand => new RelayCommand(SearchNotes);
+        public ICommand DeleteNoteCommand => new RelayCommand<Note>(DeleteNote);
 
         public HomePageViewModel()
         {
@@ -84,6 +85,33 @@ namespace NoteMaster.ViewModels
                 ).ToList();
                 Notes = new ObservableCollection<Note>(filtered);
             }
+        }
+
+        private void DeleteNote(Note note)
+        {
+            if (note == null) return;
+
+            var notes = _storageService.LoadNotes();
+            var noteToDelete = notes.FirstOrDefault(n => n.Id == note.Id);
+            if (noteToDelete != null)
+            {
+                notes.Remove(noteToDelete);
+                _storageService.SaveNotes(notes);
+                Notes.Remove(note);
+            }
+        }
+    }
+
+    public class RelayCommand<T> : ICommand
+    {
+        private readonly Action<T> _execute;
+        public RelayCommand(Action<T> execute) => _execute = execute;
+        public bool CanExecute(object? parameter) => true;
+        public void Execute(object? parameter) => _execute((T)parameter);
+        public event EventHandler? CanExecuteChanged
+        {
+            add { }
+            remove { }
         }
     }
 }

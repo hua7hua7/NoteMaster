@@ -13,6 +13,8 @@
                 <ResourceDictionary Source="/Views/Styles/MainStyle.xaml"/>
                 
                 <ResourceDictionary Source="/Views/Styles/HomePageStyle.xaml"/>
+
+                <ResourceDictionary Source="/Views/Styles/NoteEditPageStyle.xaml"/>
                 
                 <!--<ResourceDictionary Source="/Views/style/MainWindowDictionary.xaml"/>-->
             </ResourceDictionary.MergedDictionaries>

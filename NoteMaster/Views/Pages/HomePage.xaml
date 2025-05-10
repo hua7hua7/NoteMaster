@@ -9,8 +9,14 @@
 
 
     <Border CornerRadius="5" Background="{DynamicResource SecundaryBackgroundColor}">
-        <StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="20,20,20,0" VerticalAlignment="Top">
+        <!--上方搜索栏-->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20,20,20,0" VerticalAlignment="Top">
                 <TextBox Width="200" Height="32" Margin="0,0,8,0" VerticalAlignment="Center"
                          Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
                          FontSize="16" FontFamily="Segoe UI, Microsoft YaHei UI" 
@@ -29,18 +35,25 @@
                     Command="{Binding SearchCommand}">
                     <Path Data="{StaticResource search}" Fill="#000" Width="18" Height="18"/>
                 </Button>
-                <!--为“新建”添加点击事件，跳转到新建文件的页面-->
+                <!--为"新建"添加点击事件，跳转到新建文件的页面-->
                 <Button Style ="{StaticResource IconStyle}" Tag="add"   ToolTip="添加笔记"  Click="rd_addNote">
                     <Path Data="{StaticResource add}" Fill="#000" Width="18" Height="18"/>
                 </Button>
             </StackPanel>
-            <ListView x:Name="noteList" ItemsSource="{Binding Notes}" Margin="20,10,20,20" Background="Transparent" BorderThickness="0" ItemContainerStyle="{StaticResource lstStyle}">
+            
+            <!--笔记卡片-->
+            <ListView Grid.Row="1" x:Name="noteList" ItemsSource="{Binding Notes}" Margin="20,10,20,20" 
+                      Background="Transparent" BorderThickness="0" 
+                      ItemContainerStyle="{StaticResource lstStyle}"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.CanContentScroll="True">
                 <!--让ListView控件本身的点击效果失效-->
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <!--为笔记卡片添加点击事件-->
                         <Border Background="White" Margin="0,0,0,10" Padding="16" CornerRadius="6" 
-                                MouseLeftButtonDown="NoteCard_Click" Cursor="Hand">
+                                MouseLeftButtonDown="NoteCard_Click" Cursor="Hand"
+                                Style="{StaticResource NoteCardStyle}">
                             <Border.RenderTransform>
                                 <ScaleTransform x:Name="cardScale" ScaleX="1" ScaleY="1"/>
                             </Border.RenderTransform>
@@ -53,6 +66,6 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-        </StackPanel>
+        </Grid>
     </Border>
 </Page>

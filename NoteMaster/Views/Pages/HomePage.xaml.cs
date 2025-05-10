@@ -32,13 +32,14 @@ namespace NoteMaster.Views.Pages
         {
             if (sender is Border border && border.DataContext is Note selectedNote)
             {
-                // 打开详细笔记页面（你可以跳转页面或弹出详情窗体）
-                MessageBox.Show($"标题: {selectedNote.Title}\n内容: {selectedNote.Content}", "笔记详情");
+                // 跳转到NoteEditPage进行编辑
+                NavigationService?.Navigate(new NoteEditPage(selectedNote));
             }
         }
-        private void rd_addNote(object sender,RoutedEventArgs e)
+        private void rd_addNote(object sender, RoutedEventArgs e)
         {
-            //PagesNavigation.Navigate(new System.Uri("/Views/Pages/HomePage.xaml", UriKind.RelativeOrAbsolute));
+            //跳转到新建清单页面
+            NavigationService.Navigate(new Uri("/Views/Pages/NoteEditPage.xaml", UriKind.Relative));
         }
         
     }
