@@ -7,6 +7,15 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="HomePage">
 
+    <Page.Resources>
+        <!-- 标签样式 -->
+        <Style x:Key="TagChipStyle" TargetType="Border">
+            <Setter Property="Background" Value="#E0E0E0"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Margin" Value="0,0,4,4"/>
+        </Style>
+    </Page.Resources>
 
     <Border CornerRadius="5" Background="{DynamicResource SecundaryBackgroundColor}">
         <!--上方搜索栏-->
@@ -17,26 +26,72 @@
             </Grid.RowDefinitions>
             
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="20,20,20,0" VerticalAlignment="Top">
-                <TextBox Width="200" Height="32" Margin="0,0,8,0" VerticalAlignment="Center"
-                         Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
-                         FontSize="16" FontFamily="Segoe UI, Microsoft YaHei UI" 
-                         Background="#FFF" BorderBrush="#DDD" BorderThickness="1"
-                         Padding="10,0,10,0"
-                         Foreground="#222"
-                         HorizontalContentAlignment="Left"
-                         VerticalContentAlignment="Center">
-                    <TextBox.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="16"/>
-                        </Style>
-                    </TextBox.Resources>
-                </TextBox>
-                <Button Style ="{StaticResource IconStyle}" Tag="search"  
-                    Command="{Binding SearchCommand}">
+                <!-- 搜索框 -->
+                <Grid Width="200" Height="32" Margin="0,0,8,0">
+                    <TextBox x:Name="SearchTextBox"
+                            Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="16" 
+                            FontFamily="Segoe UI, Microsoft YaHei UI" 
+                            Background="#FFF" 
+                            BorderBrush="#DDD" 
+                            BorderThickness="1"
+                            Padding="10,0,10,0"
+                            Foreground="#222"
+                            HorizontalContentAlignment="Left"
+                            VerticalContentAlignment="Center"
+                            TextChanged="SearchTextBox_TextChanged">
+                        <TextBox.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="16"/>
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+                    <TextBlock x:Name="SearchPlaceholder"
+                              Text="搜索笔记或标签..."
+                              FontSize="16"
+                              FontFamily="Segoe UI, Microsoft YaHei UI"
+                              Foreground="#888"
+                              Margin="10,0,0,0"
+                              IsHitTestVisible="False"
+                              Visibility="Visible"
+                              VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- 标签选择框 -->
+                <Grid Width="120" Height="32" Margin="0,0,8,0">
+                    <ComboBox x:Name="TagComboBox"
+                             ItemsSource="{Binding AllTags}"
+                             SelectedItem="{Binding SelectedTag}"
+                             FontSize="16"
+                             FontFamily="Segoe UI, Microsoft YaHei UI"
+                             Background="#FFF"
+                             BorderBrush="#DDD"
+                             BorderThickness="1"
+                             Padding="10,0,10,0"
+                             SelectionChanged="TagComboBox_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock x:Name="TagPlaceholder"
+                              Text="选择标签"
+                              FontSize="16"
+                              FontFamily="Segoe UI, Microsoft YaHei UI"
+                              Foreground="#888"
+                              Margin="10,0,0,0"
+                              IsHitTestVisible="False"
+                              Visibility="Visible"
+                              VerticalAlignment="Center"/>
+                </Grid>
+
+                <Button Style="{StaticResource IconStyle}" Tag="search"  
+                        Command="{Binding SearchCommand}">
                     <Path Data="{StaticResource search}" Fill="#000" Width="18" Height="18"/>
                 </Button>
                 <!--为"新建"添加点击事件，跳转到新建文件的页面-->
-                <Button Style ="{StaticResource IconStyle}" Tag="add"   ToolTip="添加笔记"  Click="rd_addNote">
+                <Button Style="{StaticResource IconStyle}" Tag="add" ToolTip="添加笔记" Click="rd_addNote">
                     <Path Data="{StaticResource add}" Fill="#000" Width="18" Height="18"/>
                 </Button>
             </StackPanel>
@@ -61,6 +116,20 @@
                                 <TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
                                 <TextBlock Text="{Binding CreatedAt, StringFormat='{}{0:MM月dd日}'}" FontSize="12" Foreground="#888" Margin="0,4,0,0"/>
                                 <TextBlock Text="{Binding Content}" FontSize="14" Foreground="#444" MaxHeight="60" TextTrimming="CharacterEllipsis" Margin="0,4,0,0"/>
+                                <!-- 标签显示区域 -->
+                                <WrapPanel Margin="0,4,0,0">
+                                    <ItemsControl ItemsSource="{Binding Tags}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource TagChipStyle}">
+                                                    <TextBlock Text="{Binding}" 
+                                                               Foreground="#444" 
+                                                               FontSize="12"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </WrapPanel>
                             </StackPanel>
                         </Border>
                     </DataTemplate>

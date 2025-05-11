@@ -11,6 +11,13 @@
     <Page.Resources>
         <!-- 布尔值到可见性的转换器，用于控制删除按钮的显示/隐藏 -->
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <!-- 标签样式 -->
+        <Style x:Key="TagChipStyle" TargetType="Border">
+            <Setter Property="Background" Value="#E0E0E0"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Margin" Value="0,0,8,8"/>
+        </Style>
     </Page.Resources>
 
     <Grid Background="#F5F7FA" Margin="0">
@@ -23,9 +30,10 @@
 
         <!-- 主要内容区域 -->
         <Grid Margin="32,72,32,80">
-            <!-- 定义三行布局：标题、内容、按钮 -->
+            <!-- 定义四行布局：标题、标签、内容、按钮 -->
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>  <!-- 标题行自适应高度 -->
+                <RowDefinition Height="Auto"/>  <!-- 标签行自适应高度 -->
                 <RowDefinition Height="*"/>     <!-- 内容行占满剩余空间 -->
                 <RowDefinition Height="Auto"/>  <!-- 按钮行自适应高度 -->
             </Grid.RowDefinitions>
@@ -52,8 +60,66 @@
                            VerticalAlignment="Center"/>
             </Grid>
 
+            <!-- 标签输入和显示区域 -->
+            <Grid Grid.Row="1" Margin="0,0,0,18">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- 标签输入框 -->
+                <Grid Grid.Row="0">
+                    <TextBox x:Name="TagInputBox"
+                             Style="{StaticResource MinimalTextBox}"
+                             FontSize="14"
+                             Foreground="#444"
+                             TextChanged="TagInputBox_TextChanged"
+                             KeyDown="TagInputBox_KeyDown"
+                             Margin="0,0,0,8"
+                             Text="{Binding NewTag, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock x:Name="TagPlaceholder"
+                               Text="输入标签，按回车添加..."
+                               FontSize="14"
+                               Foreground="#B0B0B0"
+                               Margin="2,0,0,0"
+                               IsHitTestVisible="False"
+                               Visibility="Visible"/>
+                </Grid>
+
+                <!-- 标签显示区域 -->
+                <WrapPanel Grid.Row="1" x:Name="TagsPanel">
+                    <ItemsControl ItemsSource="{Binding Tags}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource TagChipStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding}" 
+                                                   Foreground="#444" 
+                                                   Margin="0,0,4,0"/>
+                                        <Button Grid.Column="1"
+                                                Click="RemoveTag_Click"
+                                                Tag="{Binding}"
+                                                Style="{StaticResource MinimalButton}"
+                                                Padding="4,0"
+                                                Background="Transparent">
+                                            <TextBlock Text="×" 
+                                                       Foreground="#666" 
+                                                       FontSize="16"/>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </WrapPanel>
+            </Grid>
+
             <!-- 笔记内容输入区域 -->
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="2">
                 <TextBox x:Name="ContentTextBox"
                          Style="{StaticResource MinimalTextBox}"
                          AcceptsReturn="True"
@@ -74,7 +140,7 @@
             </Grid>
 
             <!-- 底部按钮区域 -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
                 <!-- 删除按钮：仅在编辑模式下显示 -->
                 <Button Style="{StaticResource MinimalButton}" 
                         Background="#FF4444"

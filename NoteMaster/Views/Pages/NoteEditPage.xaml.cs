@@ -67,6 +67,35 @@ namespace NoteMaster.Views.Pages
                 : Visibility.Collapsed;
         }
 
+        private void TagInputBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TagPlaceholder.Visibility = string.IsNullOrWhiteSpace(TagInputBox.Text)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
+        private void TagInputBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && !string.IsNullOrWhiteSpace(TagInputBox.Text))
+            {
+                string newTag = TagInputBox.Text.Trim();
+                if (!string.IsNullOrEmpty(newTag))
+                {
+                    _viewModel.AddTag(newTag);
+                    TagInputBox.Text = string.Empty;
+                }
+                e.Handled = true;
+            }
+        }
+
+        private void RemoveTag_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.Tag is string tag)
+            {
+                _viewModel.RemoveTag(tag);
+            }
+        }
+
         //返回按钮点击事件
         private void rd_HomePage(object? sender,EventArgs e)
         {

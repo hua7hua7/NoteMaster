@@ -23,6 +23,8 @@ namespace NoteMaster.ViewModels
         private ObservableCollection<Note> _notes = new();
         private ObservableCollection<Folder> _folders = new();
         private string _searchQuery = string.Empty;
+        private string? _selectedTag;
+        private ObservableCollection<string> _allTags = new();
 
         public ObservableCollection<Note> Notes
         {
@@ -56,11 +58,39 @@ namespace NoteMaster.ViewModels
                 {
                     _searchQuery = value;
                     OnPropertyChanged(nameof(SearchQuery));
+                    Search();
                 }
             }
         }
 
-        public ICommand SearchCommand => new RelayCommand(SearchNotes);
+        public string? SelectedTag
+        {
+            get => _selectedTag;
+            set
+            {
+                if (_selectedTag != value)
+                {
+                    _selectedTag = value;
+                    OnPropertyChanged(nameof(SelectedTag));
+                    Search();
+                }
+            }
+        }
+
+        public ObservableCollection<string> AllTags
+        {
+            get => _allTags;
+            private set
+            {
+                if (_allTags != value)
+                {
+                    _allTags = value;
+                    OnPropertyChanged(nameof(AllTags));
+                }
+            }
+        }
+
+        public ICommand SearchCommand => new RelayCommand(Search);
         public ICommand DeleteNoteCommand => new RelayCommand<Note>(DeleteNote);
 
         public HomePageViewModel()
@@ -68,23 +98,40 @@ namespace NoteMaster.ViewModels
             _storageService = new DataStorageService();
             Notes = new ObservableCollection<Note>(_storageService.LoadNotes());
             //Folders = new ObservableCollection<Folder>(_storageService.LoadFolders());  
+            LoadData();
         }
 
-        private void SearchNotes()
+        private void LoadData()
         {
-            var allNotes = _storageService.LoadNotes();
-            if (string.IsNullOrWhiteSpace(SearchQuery))
+            var notes = _storageService.LoadNotes();
+            _notes = new ObservableCollection<Note>(notes);
+
+            var tags = notes.SelectMany(n => n.Tags ?? new List<string>())
+                           .Distinct()
+                           .OrderBy(t => t);
+            _allTags = new ObservableCollection<string>(tags);
+        }
+
+        private void Search()
+        {
+            var notes = _storageService.LoadNotes();
+
+            if (!string.IsNullOrEmpty(_selectedTag))
             {
-                Notes = new ObservableCollection<Note>(allNotes);
+                notes = notes.Where(n => n.Tags != null && n.Tags.Contains(_selectedTag)).ToList();
             }
-            else
+
+            if (!string.IsNullOrWhiteSpace(_searchQuery))
             {
-                var filtered = allNotes.Where(n =>
-                    (n.Title != null && n.Title.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)) ||
-                    (n.Content != null && n.Content.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))
+                var searchLower = _searchQuery.ToLower();
+                notes = notes.Where(n =>
+                    (n.Title?.ToLower().Contains(searchLower) ?? false) ||
+                    (n.Content?.ToLower().Contains(searchLower) ?? false) ||
+                    (n.Tags?.Any(t => t.ToLower().Contains(searchLower)) ?? false)
                 ).ToList();
-                Notes = new ObservableCollection<Note>(filtered);
             }
+
+            Notes = new ObservableCollection<Note>(notes);
         }
 
         private void DeleteNote(Note note)

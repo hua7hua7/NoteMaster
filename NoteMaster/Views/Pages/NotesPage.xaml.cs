@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using NoteMaster.ViewModels;
+using NoteMaster.Models;
 
 namespace NoteMaster.Views.Pages
 {
@@ -22,7 +23,6 @@ namespace NoteMaster.Views.Pages
     public partial class NotesPage : Page
     {
         private readonly ArchiveViewModel _viewModel;
-        private NoteMaster.Models.Folder? _pendingSelectedFolder = null;
 
         public NotesPage()
         {
@@ -31,19 +31,36 @@ namespace NoteMaster.Views.Pages
             DataContext = _viewModel;
         }
 
+        private void FolderListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ListBox listBox && listBox.SelectedItem is Folder selectedFolder)
+            {
+                _viewModel.SelectFolder(selectedFolder);
+            }
+        }
+
         private void FolderListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (_viewModel.CurrentFolder != null)
+            if (sender is ListBox listBox && listBox.SelectedItem is Folder selectedFolder)
             {
-                _viewModel.SelectFolder(_viewModel.CurrentFolder);
+                _viewModel.ViewFolder(selectedFolder);
             }
         }
 
         private void NotesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (DataContext is ArchiveViewModel vm && sender is ListBox lb)
+            if (sender is ListBox listBox)
             {
-                vm.SelectedNotes = new System.Collections.ObjectModel.ObservableCollection<NoteMaster.Models.Note>(lb.SelectedItems.Cast<NoteMaster.Models.Note>());
+                var selectedNotes = listBox.SelectedItems.Cast<Note>().ToList();
+                _viewModel.SelectedNotes = new System.Collections.ObjectModel.ObservableCollection<Note>(selectedNotes);
+            }
+        }
+
+        private void NotesListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ListBox listBox && listBox.SelectedItem is Note selectedNote)
+            {
+                NavigationService?.Navigate(new NoteEditPage(selectedNote));
             }
         }
     }

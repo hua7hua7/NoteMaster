@@ -4,28 +4,33 @@ namespace NoteMaster.Views
 {
     public partial class RenameFolderDialog : Window
     {
-        public string NewName { get; set; }
+        public string NewFolderName { get; private set; }
 
-        public RenameFolderDialog(string currentName)
+        public RenameFolderDialog(string currentName = "")
         {
             InitializeComponent();
-            NewName = currentName;
-            DataContext = this;
+            FolderNameTextBox.Text = currentName;
+            FolderNameTextBox.SelectAll();
+            FolderNameTextBox.Focus();
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(NewName))
+            if (string.IsNullOrWhiteSpace(FolderNameTextBox.Text))
             {
-                MessageBox.Show("文件夹名称不能为空！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("文件夹名称不能为空！", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
+            NewFolderName = FolderNameTextBox.Text.Trim();
             DialogResult = true;
+            Close();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+            Close();
         }
     }
 } 

@@ -22,10 +22,13 @@ namespace NoteMaster.Views.Pages
     /// </summary>
     public partial class HomePage : Page
     {
+        private HomePageViewModel _viewModel;
+
         public HomePage()
         {
             InitializeComponent();
-            DataContext = new HomePageViewModel();
+            _viewModel = new HomePageViewModel();
+            this.DataContext = _viewModel;
         }
 
         private void NoteCard_Click(object sender, MouseButtonEventArgs e)
@@ -41,6 +44,19 @@ namespace NoteMaster.Views.Pages
             //跳转到新建清单页面
             NavigationService.Navigate(new Uri("/Views/Pages/NoteEditPage.xaml", UriKind.Relative));
         }
-        
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SearchPlaceholder.Visibility = string.IsNullOrWhiteSpace(SearchTextBox.Text)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
+        private void TagComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TagPlaceholder.Visibility = TagComboBox.SelectedItem == null
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
     }
 }

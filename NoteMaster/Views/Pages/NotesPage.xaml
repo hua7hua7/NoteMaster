@@ -23,7 +23,14 @@
                     <Button Content="重命名文件夹" Command="{Binding RenameFolderCommand}" Margin="0,0,0,5"/>
                     <Button Content="取消选择文件夹" Command="{Binding CancelSelectFolderCommand}"/>
                 </StackPanel>
-                <ListBox x:Name="FolderListBox" ItemsSource="{Binding Folders}" SelectedItem="{Binding CurrentFolder, Mode=TwoWay}" DisplayMemberPath="Name" MouseDoubleClick="FolderListBox_MouseDoubleClick"/>
+                <ListBox x:Name="FolderListBox" 
+                         ItemsSource="{Binding Folders}" 
+                         SelectedItem="{Binding SelectedFolder, Mode=TwoWay}" 
+                         DisplayMemberPath="Name" 
+                         SelectionChanged="FolderListBox_SelectionChanged"
+                         MouseDoubleClick="FolderListBox_MouseDoubleClick"
+                         Background="Transparent"
+                         BorderThickness="0"/>
             </DockPanel>
         </Border>
 
@@ -35,7 +42,22 @@
                     <Button Content="移入当前文件夹" Command="{Binding MoveNotesToFolderCommand}" Margin="0,0,5,0"/>
                     <Button Content="移出当前文件夹" Command="{Binding RemoveNotesFromFolderCommand}"/>
                 </StackPanel>
-                <ListBox ItemsSource="{Binding DisplayedNotes}" DisplayMemberPath="Title" SelectionMode="Extended" SelectionChanged="NotesListBox_SelectionChanged"/>
+                <ListBox x:Name="NotesListBox"
+                         ItemsSource="{Binding DisplayedNotes}" 
+                         SelectionMode="Extended"
+                         SelectionChanged="NotesListBox_SelectionChanged"
+                         MouseDoubleClick="NotesListBox_MouseDoubleClick"
+                         Background="Transparent"
+                         BorderThickness="0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="5">
+                                <TextBlock Text="{Binding Title}" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding Content}" TextTrimming="CharacterEllipsis" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </DockPanel>
         </Border>
     </Grid>

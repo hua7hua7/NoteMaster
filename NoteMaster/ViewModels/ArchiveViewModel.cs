@@ -14,19 +14,54 @@ namespace NoteMaster.ViewModels
     public class ArchiveViewModel : INotifyPropertyChanged
     {
         private readonly DataStorageService _storageService;
-        private ObservableCollection<Folder> _folders = new();
-        private Folder? _selectedFolder;
         private ObservableCollection<Note> _notes = new();
-        private ObservableCollection<Note> _selectedNotes = new();
+        private ObservableCollection<Folder> _folders = new();
         private Folder? _currentFolder;
+        private Folder? _selectedFolder;
+        private ObservableCollection<Note> _displayedNotes = new();
+        private ObservableCollection<Note> _selectedNotes = new();
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged(string propertyName) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        public ObservableCollection<Note> Notes
+        {
+            get => _notes;
+            private set
+            {
+                if (_notes != value)
+                {
+                    _notes = value;
+                    OnPropertyChanged(nameof(Notes));
+                }
+            }
+        }
 
         public ObservableCollection<Folder> Folders
         {
             get => _folders;
-            set
+            private set
             {
-                _folders = value;
-                OnPropertyChanged(nameof(Folders));
+                if (_folders != value)
+                {
+                    _folders = value;
+                    OnPropertyChanged(nameof(Folders));
+                }
+            }
+        }
+
+        public Folder? CurrentFolder
+        {
+            get => _currentFolder;
+            private set
+            {
+                if (_currentFolder != value)
+                {
+                    _currentFolder = value;
+                    OnPropertyChanged(nameof(CurrentFolder));
+                    UpdateDisplayedNotes();
+                }
             }
         }
 
@@ -35,31 +70,24 @@ namespace NoteMaster.ViewModels
             get => _selectedFolder;
             set
             {
-                _selectedFolder = value;
-                OnPropertyChanged(nameof(SelectedFolder));
-                OnPropertyChanged(nameof(DisplayedNotes));
-            }
-        }
-
-        public Folder? CurrentFolder
-        {
-            get => _currentFolder;
-            set
-            {
-                _currentFolder = value;
-                OnPropertyChanged(nameof(CurrentFolder));
+                if (_selectedFolder != value)
+                {
+                    _selectedFolder = value;
+                    OnPropertyChanged(nameof(SelectedFolder));
+                }
             }
         }
 
         public ObservableCollection<Note> DisplayedNotes
         {
-            get
+            get => _displayedNotes;
+            private set
             {
-                var allNotes = _storageService.LoadNotes();
-                if (SelectedFolder == null)
-                    return new ObservableCollection<Note>(allNotes.Where(n => n.FolderId == null));
-                else
-                    return new ObservableCollection<Note>(allNotes.Where(n => n.FolderId == SelectedFolder.Id));
+                if (_displayedNotes != value)
+                {
+                    _displayedNotes = value;
+                    OnPropertyChanged(nameof(DisplayedNotes));
+                }
             }
         }
 
@@ -68,57 +96,82 @@ namespace NoteMaster.ViewModels
             get => _selectedNotes;
             set
             {
-                _selectedNotes = value;
-                OnPropertyChanged(nameof(SelectedNotes));
+                if (_selectedNotes != value)
+                {
+                    _selectedNotes = value;
+                    OnPropertyChanged(nameof(SelectedNotes));
+                }
             }
         }
 
-        public ICommand CreateFolderCommand { get; }
-        public ICommand DeleteFolderCommand { get; }
-        public ICommand RenameFolderCommand { get; }
-        public ICommand CancelSelectFolderCommand { get; }
-        public ICommand MoveNotesToFolderCommand { get; }
-        public ICommand RemoveNotesFromFolderCommand { get; }
+        public ICommand CreateFolderCommand => new RelayCommand(CreateFolder);
+        public ICommand DeleteFolderCommand => new RelayCommand(DeleteFolder);
+        public ICommand RenameFolderCommand => new RelayCommand(RenameFolder);
+        public ICommand CancelSelectFolderCommand => new RelayCommand(CancelSelectFolder);
+        public ICommand MoveNotesToFolderCommand => new RelayCommand(MoveNotesToFolder);
+        public ICommand RemoveNotesFromFolderCommand => new RelayCommand(RemoveNotesFromFolder);
 
         public ArchiveViewModel()
         {
             _storageService = new DataStorageService();
-            Folders = new ObservableCollection<Folder>(_storageService.LoadFolders());
-            _notes = new ObservableCollection<Note>(_storageService.LoadNotes());
+            LoadData();
+        }
 
-            CreateFolderCommand = new RelayCommand(CreateFolder);
-            DeleteFolderCommand = new RelayCommand(DeleteFolder);
-            RenameFolderCommand = new RelayCommand(RenameFolder);
-            CancelSelectFolderCommand = new RelayCommand(CancelSelectFolder);
-            MoveNotesToFolderCommand = new RelayCommand(MoveNotesToFolder);
-            RemoveNotesFromFolderCommand = new RelayCommand(RemoveNotesFromFolder);
+        private void LoadData()
+        {
+            Notes = new ObservableCollection<Note>(_storageService.LoadNotes());
+            Folders = new ObservableCollection<Folder>(_storageService.LoadFolders());
+            UpdateDisplayedNotes();
         }
 
         public void SelectFolder(Folder folder)
         {
+            if (folder == null) return;
             SelectedFolder = folder;
         }
 
-        private void CancelSelectFolder()
+        public void ViewFolder(Folder folder)
         {
-            SelectedFolder = null;
+            if (folder == null) return;
+            CurrentFolder = folder;
+            SelectedFolder = folder;
+            UpdateDisplayedNotes();
+        }
+
+        private void UpdateDisplayedNotes()
+        {
+            if (CurrentFolder == null)
+            {
+                DisplayedNotes = new ObservableCollection<Note>(
+                    Notes.Where(n => n.FolderId == null)
+                );
+            }
+            else
+            {
+                DisplayedNotes = new ObservableCollection<Note>(
+                    Notes.Where(n => n.FolderId == CurrentFolder.Id)
+                );
+            }
+            SelectedNotes.Clear();
         }
 
         private void CreateFolder()
         {
-            var newFolder = new Folder
-            {
-                Id = Folders.Count + 1,
-                Name = "New Folder"
+            var folder = new Folder 
+            { 
+                Name = "新建文件夹",
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             };
-            Folders.Add(newFolder);
+            Folders.Add(folder);
             _storageService.SaveFolders(Folders.ToList());
-            OnPropertyChanged(nameof(Folders));
+            SelectedFolder = folder;
         }
 
         private void DeleteFolder()
         {
             if (SelectedFolder == null) return;
+
             var result = MessageBox.Show(
                 "删除文件夹时，是否同时删除其中的便签？\n选择是删除便签，选择否将便签移到根目录。",
                 "确认删除",
@@ -127,13 +180,12 @@ namespace NoteMaster.ViewModels
 
             if (result == MessageBoxResult.Cancel) return;
 
-            var allNotes = _storageService.LoadNotes();
-            var notesInFolder = allNotes.Where(n => n.FolderId == SelectedFolder.Id).ToList();
+            var notesInFolder = Notes.Where(n => n.FolderId == SelectedFolder.Id).ToList();
             if (result == MessageBoxResult.Yes)
             {
                 foreach (var note in notesInFolder)
                 {
-                    allNotes.Remove(note);
+                    Notes.Remove(note);
                 }
             }
             else
@@ -146,61 +198,62 @@ namespace NoteMaster.ViewModels
 
             Folders.Remove(SelectedFolder);
             _storageService.SaveFolders(Folders.ToList());
-            _storageService.SaveNotes(allNotes);
-            OnPropertyChanged(nameof(Folders));
-            OnPropertyChanged(nameof(DisplayedNotes));
+            _storageService.SaveNotes(Notes.ToList());
+            
+            if (CurrentFolder == SelectedFolder)
+            {
+                CurrentFolder = null;
+            }
             SelectedFolder = null;
+            UpdateDisplayedNotes();
         }
 
         private void RenameFolder()
         {
             if (SelectedFolder == null) return;
+
             var dialog = new RenameFolderDialog(SelectedFolder.Name);
             if (dialog.ShowDialog() == true)
             {
-                SelectedFolder.Name = dialog.NewName;
+                SelectedFolder.Name = dialog.NewFolderName;
                 SelectedFolder.UpdatedAt = DateTime.Now;
                 _storageService.SaveFolders(Folders.ToList());
-                OnPropertyChanged(nameof(Folders));
             }
+        }
+
+        private void CancelSelectFolder()
+        {
+            SelectedFolder = null;
+            CurrentFolder = null;
+            UpdateDisplayedNotes();
         }
 
         private void MoveNotesToFolder()
         {
-            if (CurrentFolder == null || SelectedNotes == null || SelectedNotes.Count == 0) return;
-            var allNotes = _storageService.LoadNotes();
+            if (SelectedFolder == null || SelectedNotes.Count == 0) return;
+
             foreach (var note in SelectedNotes)
             {
-                var n = allNotes.FirstOrDefault(x => x.Id == note.Id);
-                if (n != null)
-                {
-                    n.FolderId = CurrentFolder.Id;
-                }
+                note.FolderId = SelectedFolder.Id;
+                note.UpdatedAt = DateTime.Now;
             }
-            _storageService.SaveNotes(allNotes);
-            OnPropertyChanged(nameof(DisplayedNotes));
+
+            _storageService.SaveNotes(Notes.ToList());
+            UpdateDisplayedNotes();
         }
 
         private void RemoveNotesFromFolder()
         {
-            if (SelectedNotes == null || SelectedNotes.Count == 0) return;
-            var allNotes = _storageService.LoadNotes();
+            if (CurrentFolder == null || SelectedNotes.Count == 0) return;
+
             foreach (var note in SelectedNotes)
             {
-                var n = allNotes.FirstOrDefault(x => x.Id == note.Id);
-                if (n != null)
-                {
-                    n.FolderId = null;
-                }
+                note.FolderId = null;
+                note.UpdatedAt = DateTime.Now;
             }
-            _storageService.SaveNotes(allNotes);
-            OnPropertyChanged(nameof(DisplayedNotes));
-        }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            _storageService.SaveNotes(Notes.ToList());
+            UpdateDisplayedNotes();
         }
     }
 } 

@@ -194,7 +194,7 @@ namespace NoteMaster.ViewModels
             var dialog = new RenameFolderDialog(SelectedFolder.Name);
             if (dialog.ShowDialog() == true)
             {
-                SelectedFolder.Name = dialog.NewName;
+                SelectedFolder.Name = dialog.NewFolderName;
                 SelectedFolder.UpdatedAt = DateTime.Now;
                 _storageService.SaveFolders(Folders.ToList());
                 
