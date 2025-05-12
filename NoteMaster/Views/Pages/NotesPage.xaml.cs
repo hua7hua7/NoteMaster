@@ -39,6 +39,13 @@ namespace NoteMaster.Views.Pages
             if (sender is ListBox listBox && listBox.SelectedItem is Folder selectedFolder)
             {
                 _viewModel.SelectFolder(selectedFolder);
+            }
+        }
+
+        private void FolderListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ListBox listBox && listBox.SelectedItem is Folder selectedFolder)
+            {
                 _viewModel.ViewFolder(selectedFolder);
             }
         }

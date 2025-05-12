@@ -63,6 +63,7 @@
                          ItemsSource="{Binding Folders}"
                          SelectedItem="{Binding SelectedFolder, Mode=TwoWay}"
                          SelectionChanged="FolderListBox_SelectionChanged"
+                         MouseDoubleClick="FolderListBox_MouseDoubleClick"
                          Style="{StaticResource FolderListBoxStyle}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>

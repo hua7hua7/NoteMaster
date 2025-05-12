@@ -135,7 +135,6 @@ namespace NoteMaster.ViewModels
         {
             if (folder == null) return;
             CurrentFolder = folder;
-            SelectedFolder = folder;
             UpdateDisplayedNotes();
         }
 

@@ -10,11 +10,17 @@
     <Page.Resources>
         <!-- 标签样式 -->
         <Style x:Key="TagChipStyle" TargetType="Border">
-            <Setter Property="Background" Value="#E0E0E0"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="Margin" Value="0,0,4,4"/>
+            <Setter Property="Background" Value="#F0F6FF"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="Margin" Value="0,0,6,6"/>
         </Style>
+        <!-- 添加阴影效果资源 -->
+        <DropShadowEffect x:Key="SubtleShadow" 
+                          BlurRadius="8" 
+                          ShadowDepth="1" 
+                          Opacity="0.15" 
+                          Direction="270"/>
     </Page.Resources>
 
     <Border CornerRadius="5" Background="{DynamicResource SecundaryBackgroundColor}">
@@ -121,10 +127,13 @@
                                     <ItemsControl ItemsSource="{Binding Tags}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Border Style="{StaticResource TagChipStyle}">
+                                                <Border Style="{StaticResource TagChipStyle}" Effect="{StaticResource SubtleShadow}">
                                                     <TextBlock Text="{Binding}" 
-                                                               Foreground="#444" 
-                                                               FontSize="12"/>
+                                                               Foreground="#1976D2" 
+                                                               FontSize="12"
+                                                               FontWeight="SemiBold"
+                                                               Margin="0,0,2,0"
+                                                               VerticalAlignment="Center"/>
                                                 </Border>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
