@@ -8,6 +8,7 @@ using NoteMaster.Models;
 using NoteMaster.Services;
 using NoteMaster.Views;
 using System.Windows;
+using System.IO;
 
 namespace NoteMaster.ViewModels
 {
@@ -215,9 +216,48 @@ namespace NoteMaster.ViewModels
             var dialog = new RenameFolderDialog(SelectedFolder.Name);
             if (dialog.ShowDialog() == true)
             {
-                SelectedFolder.Name = dialog.NewFolderName;
+                string newName = dialog.NewFolderName.Trim();
+                
+                // 检查名称是否为空
+                if (string.IsNullOrWhiteSpace(newName))
+                {
+                    MessageBox.Show("文件夹名称不能为空！", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // 检查名称是否重复
+                if (Folders.Any(f => f.Id != SelectedFolder.Id && f.Name.Equals(newName, StringComparison.OrdinalIgnoreCase)))
+                {
+                    MessageBox.Show("已存在同名文件夹！", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // 检查名称长度
+                if (newName.Length > 50)
+                {
+                    MessageBox.Show("文件夹名称不能超过50个字符！", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // 检查名称是否包含非法字符
+                if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+                {
+                    MessageBox.Show("文件夹名称包含非法字符！", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                SelectedFolder.Name = newName;
                 SelectedFolder.UpdatedAt = DateTime.Now;
                 _storageService.SaveFolders(Folders.ToList());
+                
+                // 强制更新UI
+                var currentFolders = Folders.ToList();
+                Folders.Clear();
+                foreach (var folder in currentFolders)
+                {
+                    Folders.Add(folder);
+                }
+                OnPropertyChanged(nameof(Folders));
             }
         }
 
