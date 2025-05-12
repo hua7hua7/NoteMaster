@@ -213,52 +213,17 @@ namespace NoteMaster.ViewModels
         {
             if (SelectedFolder == null) return;
 
-            var dialog = new RenameFolderDialog(SelectedFolder.Name);
-            if (dialog.ShowDialog() == true)
+            // 取消其他正在编辑的文件夹
+            foreach (var folder in Folders)
             {
-                string newName = dialog.NewFolderName.Trim();
-                
-                // 检查名称是否为空
-                if (string.IsNullOrWhiteSpace(newName))
+                if (folder != SelectedFolder)
                 {
-                    MessageBox.Show("文件夹名称不能为空！", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
+                    folder.IsEditing = false;
                 }
-
-                // 检查名称是否重复
-                if (Folders.Any(f => f.Id != SelectedFolder.Id && f.Name.Equals(newName, StringComparison.OrdinalIgnoreCase)))
-                {
-                    MessageBox.Show("已存在同名文件夹！", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                // 检查名称长度
-                if (newName.Length > 50)
-                {
-                    MessageBox.Show("文件夹名称不能超过50个字符！", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                // 检查名称是否包含非法字符
-                if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
-                {
-                    MessageBox.Show("文件夹名称包含非法字符！", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                SelectedFolder.Name = newName;
-                SelectedFolder.UpdatedAt = DateTime.Now;
-                _storageService.SaveFolders(Folders.ToList());
-                
-                // 强制更新UI
-                var currentFolders = Folders.ToList();
-                Folders.Clear();
-                foreach (var folder in currentFolders)
-                {
-                    Folders.Add(folder);
-                }
-                OnPropertyChanged(nameof(Folders));
             }
+
+            // 开始编辑选中的文件夹
+            SelectedFolder.IsEditing = true;
         }
 
         private void CancelSelectFolder()
@@ -294,6 +259,12 @@ namespace NoteMaster.ViewModels
 
             _storageService.SaveNotes(Notes.ToList());
             UpdateDisplayedNotes();
+        }
+
+        public void SaveFolder(Folder folder)
+        {
+            _storageService.SaveFolders(Folders.ToList());
+            OnPropertyChanged(nameof(Folders));
         }
     }
 } 

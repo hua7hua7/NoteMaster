@@ -60,13 +60,33 @@
                 </Grid>
 
                 <ListBox x:Name="FolderListBox" 
-                         ItemsSource="{Binding Folders}" 
-                         SelectedItem="{Binding SelectedFolder, Mode=TwoWay}" 
-                         DisplayMemberPath="Name" 
+                         ItemsSource="{Binding Folders}"
+                         SelectedItem="{Binding SelectedFolder, Mode=TwoWay}"
                          SelectionChanged="FolderListBox_SelectionChanged"
-                         MouseDoubleClick="FolderListBox_MouseDoubleClick"
-                         Style="{StaticResource FolderListBoxStyle}"
-                         ItemContainerStyle="{StaticResource FolderListBoxItemStyle}"/>
+                         Style="{StaticResource FolderListBoxStyle}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <TextBlock Text="{Binding Name}" 
+                                          Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}"
+                                          VerticalAlignment="Center"/>
+                                <TextBox x:Name="FolderNameTextBox"
+                                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                         Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                         LostFocus="FolderNameTextBox_LostFocus"
+                                         KeyDown="FolderNameTextBox_KeyDown"
+                                         Style="{StaticResource InlineEditTextBoxStyle}"
+                                         VerticalAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource FolderListBoxItemStyle}">
+                            <Setter Property="Padding" Value="10,8"/>
+                            <Setter Property="Margin" Value="0,2"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
             </DockPanel>
         </Border>
 
