@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <None Remove="Views\Assets\Avatars\avatar-1.jpg" />
-    <None Remove="Views\Assets\Avatars\avatar-2.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,7 +20,6 @@
 
   <ItemGroup>
     <Resource Include="Views\Assets\Avatars\avatar-1.jpg" />
-    <Resource Include="Views\Assets\Avatars\avatar-2.jpg" />
   </ItemGroup>
 
 </Project>

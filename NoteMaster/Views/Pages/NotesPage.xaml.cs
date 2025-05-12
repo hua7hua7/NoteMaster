@@ -63,5 +63,10 @@ namespace NoteMaster.Views.Pages
                 NavigationService?.Navigate(new NoteEditPage(selectedNote));
             }
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
