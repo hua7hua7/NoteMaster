@@ -56,9 +56,8 @@
 
                     <StackPanel Grid.Row="2">
                         <RadioButton x:Name="rdHome" IsChecked="True" Content="笔记" Style="{DynamicResource MenuRadioButtonStyle}" Tag="{DynamicResource home}" Click="rdHome_Click" Cursor="Hand"/>
-                        <RadioButton x:Name="rdSounds" Content="待办" Style="{DynamicResource MenuRadioButtonStyle}" Tag="{DynamicResource headphones}" Margin="0 5 0 5" Click="rdSounds_Click"/>
+                        <RadioButton x:Name="rdSounds" Content="待办" Style="{DynamicResource MenuRadioButtonStyle}" Tag="{DynamicResource headphones}" Margin="0 5 0 5" Click="rdTodos_Click"/>
                         <RadioButton x:Name="rdNotes" Content="归档" Style="{DynamicResource MenuRadioButtonStyle}" Tag="{DynamicResource notes}" Click="rdNotes_Click"/>
-                        <RadioButton x:Name="rdPayment" Content="Payment" Style="{DynamicResource MenuRadioButtonStyle}" Tag="{DynamicResource payment}" Margin="0 5 0 5" Click="rdPayment_Click"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="3" VerticalAlignment="bottom" Orientation="Horizontal" Width="200" Margin="0 0 0 20">

@@ -9,15 +9,24 @@ namespace NoteMaster.Utils
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool boolValue = (bool)value;
-            bool inverse = parameter != null && parameter.ToString() == "Inverse";
-            
-            if (inverse)
+            try
             {
-                boolValue = !boolValue;
-            }
+                bool boolValue = value is bool boolVal ? boolVal : false; // 默认值为 false
+                bool inverse = parameter?.ToString() == "Inverse";
 
-            return boolValue ? Visibility.Visible : Visibility.Collapsed;
+                if (inverse)
+                {
+                    boolValue = !boolValue;
+                }
+
+                return boolValue ? Visibility.Visible : Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                // 记录异常以便调试
+                Console.WriteLine($"BooleanToVisibilityConverter 转换失败: {ex.Message}");
+                return Visibility.Collapsed; // 默认隐藏
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -25,4 +34,4 @@ namespace NoteMaster.Utils
             throw new NotImplementedException();
         }
     }
-} 
+}

@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
-using System.Linq;
 using NoteMaster.Models;
 using NoteMaster.Services;
 using NoteMaster.Views;
@@ -15,7 +14,7 @@ namespace NoteMaster.ViewModels
     {
         private readonly DataStorageService _storageService;
 
-        //dev_A分支的变量， remained to be merged
+        //dev_A分支的变量，remained to be merged
         /*private string _searchQuery;
         private ObservableCollection<Note> _notes;
         private ObservableCollection<Note> _allNotes;*/ // 存储所有笔记的备份
@@ -25,7 +24,6 @@ namespace NoteMaster.ViewModels
         private ObservableCollection<Folder> _folders = new();
         private Folder? _selectedFolder;
         private ObservableCollection<Note> _selectedNotes = new();
-
 
         public ObservableCollection<Note> Notes
         {
@@ -75,25 +73,23 @@ namespace NoteMaster.ViewModels
             {
                 _searchQuery = value;
                 OnPropertyChanged(nameof(SearchQuery));
-         //dev_A的操作
+                //dev_A的操作
                 //PerformSearch();
                 FilterNotes();
-
             }
         }
 
         // 命令定义
         public ICommand CreateNoteCommand { get; }
         //dev_A的定义
-       // public ICommand SearchCommand { get; }
-       // public ICommand CloseCommand { get; }
+        // public ICommand SearchCommand { get; }
+        // public ICommand CloseCommand { get; }
         public ICommand CreateFolderCommand { get; }
         public ICommand DeleteFolderCommand { get; }
         public ICommand RenameFolderCommand { get; }
         public ICommand MoveNotesToFolderCommand { get; }
         public ICommand RemoveNotesFromFolderCommand { get; }
         public ICommand DeleteSelectedNotesCommand { get; }
-
 
         public MainViewModel()
         {
@@ -116,12 +112,10 @@ namespace NoteMaster.ViewModels
         {
             _storageService.SaveNotes(Notes.ToList());
             OnPropertyChanged(nameof(Notes));
-
         }
 
         private void CreateNote()
         {
-
             var newNote = new Note
             {
                 Title = "New Note",
@@ -163,7 +157,7 @@ namespace NoteMaster.ViewModels
             if (result == MessageBoxResult.Cancel) return;
 
             var notesInFolder = Notes.Where(n => n.FolderId == SelectedFolder.Id).ToList();
-            
+
             if (result == MessageBoxResult.Yes)
             {
                 // 删除便签
@@ -197,7 +191,7 @@ namespace NoteMaster.ViewModels
                 SelectedFolder.Name = dialog.NewFolderName;
                 SelectedFolder.UpdatedAt = DateTime.Now;
                 _storageService.SaveFolders(Folders.ToList());
-                
+
                 // 强制更新文件夹列表
                 var currentFolders = Folders.ToList();
                 Folders.Clear();
@@ -306,17 +300,41 @@ namespace NoteMaster.ViewModels
         }
     }
 
-
     public class RelayCommand : ICommand
     {
-        private readonly Action _execute;
-        public RelayCommand(Action execute) => _execute = execute;
-        public bool CanExecute(object? parameter) => true;
-        public void Execute(object? parameter) => _execute();
-        public event EventHandler? CanExecuteChanged
+        private readonly Action<object> _execute;
+        private readonly Func<object, bool> _canExecute;
+
+        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
         {
-            add { }
-            remove { }
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
+
+        public RelayCommand(Action execute, Func<bool> canExecute = null)
+            : this(o => execute(), canExecute == null ? (Func<object, bool>)null : o => canExecute())
+        {
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            return _canExecute?.Invoke(parameter) ?? true;
+        }
+
+        public void Execute(object parameter)
+        {
+            _execute(parameter);
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        public void RaiseCanExecuteChanged()
+        {
+            CommandManager.InvalidateRequerySuggested();
         }
     }
 }
