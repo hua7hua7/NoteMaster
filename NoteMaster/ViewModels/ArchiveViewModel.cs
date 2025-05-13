@@ -6,9 +6,6 @@ using System.Linq;
 using System.Windows.Input;
 using NoteMaster.Models;
 using NoteMaster.Services;
-using NoteMaster.Views;
-using System.Windows;
-using System.IO;
 
 namespace NoteMaster.ViewModels
 {
@@ -21,6 +18,7 @@ namespace NoteMaster.ViewModels
         private Folder? _selectedFolder;
         private ObservableCollection<Note> _displayedNotes = new();
         private ObservableCollection<Note> _selectedNotes = new();
+        private string _newFolderName = string.Empty;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName) =>
@@ -105,6 +103,19 @@ namespace NoteMaster.ViewModels
             }
         }
 
+        public string NewFolderName
+        {
+            get => _newFolderName;
+            set
+            {
+                if (_newFolderName != value)
+                {
+                    _newFolderName = value;
+                    OnPropertyChanged(nameof(NewFolderName));
+                }
+            }
+        }
+
         public ICommand CreateFolderCommand => new RelayCommand(CreateFolder);
         public ICommand DeleteFolderCommand => new RelayCommand(DeleteFolder);
         public ICommand RenameFolderCommand => new RelayCommand(RenameFolder);
@@ -142,12 +153,14 @@ namespace NoteMaster.ViewModels
         {
             if (CurrentFolder == null)
             {
+                // 显示未归档的笔记
                 DisplayedNotes = new ObservableCollection<Note>(
                     Notes.Where(n => n.FolderId == null)
                 );
             }
             else
             {
+                // 显示当前文件夹的笔记
                 DisplayedNotes = new ObservableCollection<Note>(
                     Notes.Where(n => n.FolderId == CurrentFolder.Id)
                 );
@@ -157,49 +170,44 @@ namespace NoteMaster.ViewModels
 
         private void CreateFolder()
         {
-            var folder = new Folder 
-            { 
+            var newFolder = new Folder
+            {
                 Name = "新建文件夹",
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now
             };
-            Folders.Add(folder);
+
+            // 确保ID是唯一的
+            if (Folders.Any())
+            {
+                newFolder.Id = Folders.Max(f => f.Id) + 1;
+            }
+            else
+            {
+                newFolder.Id = 1;
+            }
+
+            Folders.Add(newFolder);
             _storageService.SaveFolders(Folders.ToList());
-            SelectedFolder = folder;
+            SelectedFolder = newFolder;
         }
 
         private void DeleteFolder()
         {
             if (SelectedFolder == null) return;
 
-            var result = MessageBox.Show(
-                "删除文件夹时，是否同时删除其中的便签？\n选择是删除便签，选择否将便签移到根目录。",
-                "确认删除",
-                MessageBoxButton.YesNoCancel,
-                MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Cancel) return;
-
+            // 处理文件夹中的笔记
             var notesInFolder = Notes.Where(n => n.FolderId == SelectedFolder.Id).ToList();
-            if (result == MessageBoxResult.Yes)
+            foreach (var note in notesInFolder)
             {
-                foreach (var note in notesInFolder)
-                {
-                    Notes.Remove(note);
-                }
-            }
-            else
-            {
-                foreach (var note in notesInFolder)
-                {
-                    note.FolderId = null;
-                }
+                note.FolderId = null;
+                note.UpdatedAt = DateTime.Now;
             }
 
             Folders.Remove(SelectedFolder);
             _storageService.SaveFolders(Folders.ToList());
             _storageService.SaveNotes(Notes.ToList());
-            
+
             if (CurrentFolder == SelectedFolder)
             {
                 CurrentFolder = null;
@@ -262,8 +270,10 @@ namespace NoteMaster.ViewModels
 
         public void SaveFolder(Folder folder)
         {
+            if (folder == null) return;
+            folder.UpdatedAt = DateTime.Now;
             _storageService.SaveFolders(Folders.ToList());
-            OnPropertyChanged(nameof(Folders));
+            UpdateDisplayedNotes();
         }
     }
 } 
