@@ -1,8 +1,8 @@
 using System;
-using System.Windows;
+using System.Globalization;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
-using NoteMaster.ViewModels;
 
 namespace NoteMaster.Views.Pages
 {
@@ -10,58 +10,40 @@ namespace NoteMaster.Views.Pages
     {
         public TodoPage()
         {
-            try
-            {
-                InitializeComponent();
-                DataContext = new TodoPageViewModel();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"TodoPage 初始化异常: {ex.Message}\n{ex.StackTrace}");
-            }
+            InitializeComponent();
         }
 
         private void TextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            try
+            if (e.Key == Key.Enter && sender is TextBox textBox)
             {
-                if (e.Key == Key.Enter)
+                var viewModel = DataContext as NoteMaster.ViewModels.TodoPageViewModel;
+                if (viewModel?.AddTodoCommand.CanExecute(null) == true)
                 {
-                    var viewModel = DataContext as TodoPageViewModel;
-                    if (viewModel?.AddTodoCommand.CanExecute(null) == true)
-                    {
-                        viewModel.AddTodoCommand.Execute(null);
-                    }
+                    viewModel.AddTodoCommand.Execute(null);
                 }
             }
-            catch (Exception ex)
+        }
+    }
+
+    public class InverseBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolean)
             {
-                Console.WriteLine($"TextBox_KeyDown 异常: {ex.Message}\n{ex.StackTrace}");
+                return !boolean;
             }
+            return value;
         }
 
-        protected override void OnInitialized(EventArgs e)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            try
+            if (value is bool boolean)
             {
-                base.OnInitialized(e);
+                return !boolean;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"OnInitialized 异常: {ex.Message}\n{ex.StackTrace}");
-            }
-        }
-
-        protected override void OnRender(System.Windows.Media.DrawingContext drawingContext)
-        {
-            try
-            {
-                base.OnRender(drawingContext);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"OnRender 异常: {ex.Message}\n{ex.StackTrace}");
-            }
+            return value;
         }
     }
 }

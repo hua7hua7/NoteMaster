@@ -1,31 +1,19 @@
 ﻿<Application x:Class="NoteMaster.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:utils="clr-namespace:NoteMaster.Utils">
-    <Application.Resources>
-        
+             xmlns:utils="clr-namespace:NoteMaster.Utils"
+             StartupUri="Views/MainWindow.xaml"> <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!--将资源添加到资源字典-->
                 <ResourceDictionary Source="/Views/Themes/LightTheme.xaml"/>
-
                 <ResourceDictionary Source="/Views/Assets/Icons/Icons.xaml"/>
-
                 <ResourceDictionary Source="/Views/Styles/MainStyle.xaml"/>
-                
                 <ResourceDictionary Source="/Views/Styles/HomePageStyle.xaml"/>
-
                 <ResourceDictionary Source="/Views/Styles/NoteEditPageStyle.xaml"/>
-
                 <ResourceDictionary Source="/Views/Styles/NotesPageStyle.xaml"/>
-                
             </ResourceDictionary.MergedDictionaries>
-            
+
             <utils:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            
         </ResourceDictionary>
-        
-        
-        
     </Application.Resources>
 </Application>
