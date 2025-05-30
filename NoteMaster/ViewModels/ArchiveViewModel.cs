@@ -11,19 +11,34 @@ namespace NoteMaster.ViewModels
 {
     public class ArchiveViewModel : INotifyPropertyChanged
     {
+        // 数据存储服务，用于读写笔记和文件夹数据
         private readonly DataStorageService _storageService;
+
+        // 所有笔记集合
         private ObservableCollection<Note> _notes = new();
+        // 所有文件夹集合
         private ObservableCollection<Folder> _folders = new();
+
+        // 当前查看的文件夹（右侧内容区域展示用）
         private Folder? _currentFolder;
+        // 当前选中的文件夹（用于操作按钮）
         private Folder? _selectedFolder;
+
+        // 当前界面显示的笔记集合（根据 currentFolder 决定内容）
         private ObservableCollection<Note> _displayedNotes = new();
+
+        // 当前被选中的笔记集合（用于批量移动、移除等操作）
         private ObservableCollection<Note> _selectedNotes = new();
+
+        // 输入框中用于新建文件夹的名称（默认空字符串）
         private string _newFolderName = string.Empty;
 
+        // 属性变更通知事件
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+        // 所有笔记集合的属性封装
         public ObservableCollection<Note> Notes
         {
             get => _notes;
@@ -37,6 +52,7 @@ namespace NoteMaster.ViewModels
             }
         }
 
+        // 所有文件夹集合的属性封装
         public ObservableCollection<Folder> Folders
         {
             get => _folders;
@@ -50,6 +66,7 @@ namespace NoteMaster.ViewModels
             }
         }
 
+        // 当前正在查看的文件夹
         public Folder? CurrentFolder
         {
             get => _currentFolder;
@@ -59,11 +76,12 @@ namespace NoteMaster.ViewModels
                 {
                     _currentFolder = value;
                     OnPropertyChanged(nameof(CurrentFolder));
-                    UpdateDisplayedNotes();
+                    UpdateDisplayedNotes(); // 文件夹变更时刷新显示笔记
                 }
             }
         }
 
+        // 当前选中的文件夹（可供右键菜单使用）
         public Folder? SelectedFolder
         {
             get => _selectedFolder;
@@ -77,6 +95,7 @@ namespace NoteMaster.ViewModels
             }
         }
 
+        // 实际界面显示的笔记（过滤后结果）
         public ObservableCollection<Note> DisplayedNotes
         {
             get => _displayedNotes;
@@ -90,6 +109,7 @@ namespace NoteMaster.ViewModels
             }
         }
 
+        // 当前选中的多个笔记
         public ObservableCollection<Note> SelectedNotes
         {
             get => _selectedNotes;
@@ -103,6 +123,7 @@ namespace NoteMaster.ViewModels
             }
         }
 
+        // 创建新文件夹的名称
         public string NewFolderName
         {
             get => _newFolderName;
@@ -116,6 +137,7 @@ namespace NoteMaster.ViewModels
             }
         }
 
+        // 一系列命令绑定
         public ICommand CreateFolderCommand => new RelayCommand(CreateFolder);
         public ICommand DeleteFolderCommand => new RelayCommand(DeleteFolder);
         public ICommand RenameFolderCommand => new RelayCommand(RenameFolder);
@@ -123,12 +145,14 @@ namespace NoteMaster.ViewModels
         public ICommand MoveNotesToFolderCommand => new RelayCommand(MoveNotesToFolder);
         public ICommand RemoveNotesFromFolderCommand => new RelayCommand(RemoveNotesFromFolder);
 
+        // 构造函数，加载数据
         public ArchiveViewModel()
         {
             _storageService = new DataStorageService();
             LoadData();
         }
 
+        // 加载笔记和文件夹
         private void LoadData()
         {
             Notes = new ObservableCollection<Note>(_storageService.LoadNotes());
@@ -136,12 +160,14 @@ namespace NoteMaster.ViewModels
             UpdateDisplayedNotes();
         }
 
+        // 设置选中的文件夹（不切换视图，仅用于操作）
         public void SelectFolder(Folder folder)
         {
             if (folder == null) return;
             SelectedFolder = folder;
         }
 
+        // 切换当前查看的文件夹视图
         public void ViewFolder(Folder folder)
         {
             if (folder == null) return;
@@ -149,6 +175,7 @@ namespace NoteMaster.ViewModels
             UpdateDisplayedNotes();
         }
 
+        // 根据当前查看的文件夹更新界面上显示的笔记内容
         private void UpdateDisplayedNotes()
         {
             if (CurrentFolder == null)
@@ -160,14 +187,17 @@ namespace NoteMaster.ViewModels
             }
             else
             {
-                // 显示当前文件夹的笔记
+                // 显示当前文件夹下的笔记
                 DisplayedNotes = new ObservableCollection<Note>(
                     Notes.Where(n => n.FolderId == CurrentFolder.Id)
                 );
             }
+
+            // 清空选中的笔记
             SelectedNotes.Clear();
         }
 
+        // 创建一个新文件夹
         private void CreateFolder()
         {
             var newFolder = new Folder
@@ -177,26 +207,19 @@ namespace NoteMaster.ViewModels
                 UpdatedAt = DateTime.Now
             };
 
-            // 确保ID是唯一的
-            if (Folders.Any())
-            {
-                newFolder.Id = Folders.Max(f => f.Id) + 1;
-            }
-            else
-            {
-                newFolder.Id = 1;
-            }
+            // 设置唯一 ID
+            newFolder.Id = Folders.Any() ? Folders.Max(f => f.Id) + 1 : 1;
 
             Folders.Add(newFolder);
             _storageService.SaveFolders(Folders.ToList());
             SelectedFolder = newFolder;
         }
 
+        // 删除当前选中的文件夹，同时将其中笔记移出
         private void DeleteFolder()
         {
             if (SelectedFolder == null) return;
 
-            // 处理文件夹中的笔记
             var notesInFolder = Notes.Where(n => n.FolderId == SelectedFolder.Id).ToList();
             foreach (var note in notesInFolder)
             {
@@ -212,27 +235,26 @@ namespace NoteMaster.ViewModels
             {
                 CurrentFolder = null;
             }
+
             SelectedFolder = null;
             UpdateDisplayedNotes();
         }
 
+        // 进入文件夹重命名模式
         private void RenameFolder()
         {
             if (SelectedFolder == null) return;
 
-            // 取消其他正在编辑的文件夹
+            // 取消其他文件夹的编辑状态
             foreach (var folder in Folders)
             {
-                if (folder != SelectedFolder)
-                {
-                    folder.IsEditing = false;
-                }
+                folder.IsEditing = false;
             }
 
-            // 开始编辑选中的文件夹
             SelectedFolder.IsEditing = true;
         }
 
+        // 取消当前选中的文件夹和视图
         private void CancelSelectFolder()
         {
             SelectedFolder = null;
@@ -240,6 +262,7 @@ namespace NoteMaster.ViewModels
             UpdateDisplayedNotes();
         }
 
+        // 将选中的笔记移动到选中的文件夹中
         private void MoveNotesToFolder()
         {
             if (SelectedFolder == null || SelectedNotes.Count == 0) return;
@@ -254,6 +277,7 @@ namespace NoteMaster.ViewModels
             UpdateDisplayedNotes();
         }
 
+        // 将当前文件夹中的选中笔记移出文件夹（归档 -> 未归档）
         private void RemoveNotesFromFolder()
         {
             if (CurrentFolder == null || SelectedNotes.Count == 0) return;
@@ -268,6 +292,7 @@ namespace NoteMaster.ViewModels
             UpdateDisplayedNotes();
         }
 
+        // 保存某个文件夹（通常用于重命名后）
         public void SaveFolder(Folder folder)
         {
             if (folder == null) return;
@@ -276,4 +301,4 @@ namespace NoteMaster.ViewModels
             UpdateDisplayedNotes();
         }
     }
-} 
+}

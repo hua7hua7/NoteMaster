@@ -10,15 +10,15 @@ namespace NoteMaster.Services
 {
     public class DataStorageService
     {
-        private readonly string _storagePath; // Notes JSON path
-        private readonly string _backupPath; // Notes backup path
-        private readonly string _foldersPath; // Folders JSON path
-        private readonly string _foldersBackupPath; // Folders backup path
-        private readonly string _dbPath; // Database path
-        private readonly string _todosPath; // Todos JSON path
-        private readonly string _todosBackupPath; // Todos backup path
+        private readonly string _storagePath; // 笔记 JSON 路径
+        private readonly string _backupPath; // 笔记备份路径
+        private readonly string _foldersPath; // 文件夹 JSON 路径
+        private readonly string _foldersBackupPath; // 文件夹备份路径
+        private readonly string _dbPath; // 数据库路径
+        private readonly string _todosPath; // 待办事项 JSON 路径
+        private readonly string _todosBackupPath; // 待办事项备份路径
 
-        private readonly JsonSerializerSettings _jsonSettings; // JSON serialization settings
+        private readonly JsonSerializerSettings _jsonSettings; // JSON 序列化设置
 
         public DataStorageService()
         {
@@ -38,7 +38,7 @@ namespace NoteMaster.Services
 
                 Directory.CreateDirectory(Path.GetDirectoryName(_storagePath));
 
-                // Configure JSON serialization settings
+                // 配置 JSON 序列化设置
                 _jsonSettings = new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Include,
@@ -48,7 +48,7 @@ namespace NoteMaster.Services
                     Error = (sender, args) =>
                     {
                         Console.WriteLine($"JSON 序列化/反序列化错误: {args.ErrorContext.Error.Message}\n{args.ErrorContext.Error.StackTrace}");
-                        args.ErrorContext.Handled = true; // Continue despite errors
+                        args.ErrorContext.Handled = true; // 尽管出错，仍继续
                     }
                 };
 
@@ -96,12 +96,12 @@ namespace NoteMaster.Services
         {
             try
             {
-                // Save to JSON
+                // 保存到 JSON
                 string json = JsonConvert.SerializeObject(notes, _jsonSettings);
                 File.WriteAllText(_storagePath, json);
                 Console.WriteLine($"保存 {notes.Count} 条笔记到 {_storagePath}");
 
-                // Backup
+                // 备份
                 try
                 {
                     File.Copy(_storagePath, _backupPath, true);
@@ -112,7 +112,7 @@ namespace NoteMaster.Services
                     Console.WriteLine($"笔记备份失败: {ex.Message}\n{ex.StackTrace}");
                 }
 
-                // Save to database
+                // 保存到数据库
                 using var conn = new SQLiteConnection($"Data Source={_dbPath};Version=3;");
                 conn.Open();
 
@@ -131,7 +131,7 @@ namespace NoteMaster.Services
                     cmd.Parameters.AddWithValue("$updatedAt", note.UpdatedAt.ToString("o"));
                     cmd.ExecuteNonQuery();
 
-                    // Update Tags
+                    // 更新标签
                     cmd.CommandText = "DELETE FROM Tags WHERE NoteId = $noteId";
                     cmd.Parameters.Clear();
                     cmd.Parameters.AddWithValue("$noteId", note.Id ?? "");
@@ -175,11 +175,11 @@ namespace NoteMaster.Services
 
             try
             {
-                // Load tags and metadata from database
+                // 从数据库加载标签和元数据
                 using var conn = new SQLiteConnection($"Data Source={_dbPath};Version=3;");
                 conn.Open();
 
-                // Load all tags
+                // 加载所有标签
                 var tagDict = new Dictionary<string, List<string>>();
                 var cmd = conn.CreateCommand();
                 cmd.CommandText = "SELECT NoteId, Tag FROM Tags";
@@ -195,7 +195,7 @@ namespace NoteMaster.Services
                     }
                 }
 
-                // Update notes with tags and metadata
+                // 用标签和元数据更新笔记
                 foreach (var note in notes.Where(n => n != null))
                 {
                     note.Tags = tagDict.ContainsKey(note.Id) ? tagDict[note.Id] : new List<string>();
@@ -226,12 +226,12 @@ namespace NoteMaster.Services
         {
             try
             {
-                // Save to JSON
+                // 保存到 JSON
                 string json = JsonConvert.SerializeObject(todoItems ?? new List<TodoItem>(), _jsonSettings);
                 File.WriteAllText(_todosPath, json);
                 Console.WriteLine($"保存 {todoItems?.Count ?? 0} 条待办事项到 {_todosPath}");
 
-                // Backup
+                // 备份
                 try
                 {
                     File.Copy(_todosPath, _todosBackupPath, true);
@@ -261,7 +261,7 @@ namespace NoteMaster.Services
                 string json = File.ReadAllText(_todosPath);
                 var items = JsonConvert.DeserializeObject<List<TodoItem>>(json, _jsonSettings) ?? new List<TodoItem>();
 
-                // Validate TodoItems to ensure DueDate is DateTime?
+                // 验证 TodoItems 以确保 DueDate 是 DateTime?
                 var validItems = items
                     .Where(item => item != null && (item.DueDate == null || item.DueDate is DateTime))
                     .ToList();
